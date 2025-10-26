@@ -1,9 +1,8 @@
-# MoodFlow - Your Mood Tracker
+# Your Simple Mood Tracker
 
-![MoodFlow App](https://via.placeholder.com/800x400/E8F5E9/4CAF50?text=MoodFlow+Mood+Tracker)
+[SimpleMoodTracker App]
 
-## Features of MoodFlow
-
+## Features of SimpleMoodTracker
 Your app includes everything you described and more:
 
 Main Rating System: Rate your overall day from 1-10 with visual feedback (red for bad days, yellow for okay days, green for good days).
