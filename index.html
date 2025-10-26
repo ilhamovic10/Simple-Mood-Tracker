@@ -3,16 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Mood Tracker - Mental Health Companion</title>
+    <title>Simple Mood Tracker - Mental Health Companion</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+
     <!-- Main Container -->
     <div class="container">
         
         <!-- Header Section -->
-        <header class="header">
-            <h1 class="app-title">🌸 Daily Mood Tracker</h1>
+        <header class="header animate-fade-in" id="mainHeader">
+            <h1 class="app-title">🌸 Simple Mood Tracker</h1>
             <p class="subtitle">How are you feeling today?</p>
             <p class="current-date" id="currentDate"></p>
         </header>
@@ -21,7 +28,7 @@
         <main class="main-content">
             
             <!-- Overall Mood Section -->
-            <section class="mood-section card">
+            <section class="mood-section card animate-on-scroll">
                 <h2 class="section-title">How was your day overall?</h2>
                 <div class="mood-scale">
                     <div class="scale-labels">
@@ -30,7 +37,8 @@
                     </div>
                     <input type="range" min="1" max="10" value="5" class="mood-slider" id="overallMood">
                     <div class="mood-display">
-                        <span class="mood-number" id="moodValue">5</span>
+                        <span class="mood-emoji" id="moodEmoji">😐</span>
+                    <span class="mood-number" id="moodValue">5</span>
                         <span class="mood-label" id="moodLabel">Okay</span>
                     </div>
                 </div>
@@ -41,7 +49,7 @@
                 <h2 class="section-title">Rate these areas of your day:</h2>
                 
                 <!-- Energy Level -->
-                <div class="attribute-card card">
+                <div class="attribute-card card animate-on-scroll">
                     <div class="attribute-header">
                         <span class="attribute-icon">⚡</span>
                         <div class="attribute-info">
@@ -56,7 +64,7 @@
                 </div>
 
                 <!-- Sleep Quality -->
-                <div class="attribute-card card">
+                <div class="attribute-card card animate-on-scroll">
                     <div class="attribute-header">
                         <span class="attribute-icon">😴</span>
                         <div class="attribute-info">
@@ -71,7 +79,7 @@
                 </div>
 
                 <!-- Stress Level -->
-                <div class="attribute-card card">
+                <div class="attribute-card card animate-on-scroll">
                     <div class="attribute-header">
                         <span class="attribute-icon">😰</span>
                         <div class="attribute-info">
@@ -86,7 +94,7 @@
                 </div>
 
                 <!-- Productivity -->
-                <div class="attribute-card card">
+                <div class="attribute-card card animate-on-scroll">
                     <div class="attribute-header">
                         <span class="attribute-icon">✅</span>
                         <div class="attribute-info">
@@ -101,7 +109,7 @@
                 </div>
 
                 <!-- Social Connection -->
-                <div class="attribute-card card">
+                <div class="attribute-card card animate-on-scroll">
                     <div class="attribute-header">
                         <span class="attribute-icon">💬</span>
                         <div class="attribute-info">
@@ -117,7 +125,7 @@
             </section>
 
             <!-- Notes Section -->
-            <section class="notes-section card">
+            <section class="notes-section card animate-on-scroll">
                 <h2 class="section-title">Any thoughts about your day? (optional)</h2>
                 <textarea 
                     id="dailyNotes" 
