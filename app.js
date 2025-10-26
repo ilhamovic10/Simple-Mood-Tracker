@@ -104,11 +104,12 @@ function getMoodColorClass(rating) {
  * Get an emoji based on the mood rating
  */
 function getMoodEmoji(rating) {
-    if (rating <= 2) return '😢';
-    if (rating <= 4) return '😕';
-    if (rating <= 6) return '😐';
-    if (rating <= 8) return '😊';
-    return '😄';
+    const emojis = {
+        1: '😢', 2: '😔', 3: '😟', 4: '😕',
+        5: '😐', 6: '🙂', 7: '😊', 8: '😄',
+        9: '😁', 10: '🤩'
+    };
+    return emojis[rating] || '😐';
 }
 
 /**
@@ -131,9 +132,23 @@ function getDaysAgo(dateString) {
  * Update the overall mood display when slider changes
  */
 function updateMoodDisplay() {
-    const value = overallMoodSlider.value;
+    const value = parseInt(overallMoodSlider.value);
+    const moodEmoji = document.getElementById('moodEmoji');
+    
+    // Animate number change
+    moodValueDisplay.classList.add('changed');
+    setTimeout(() => moodValueDisplay.classList.remove('changed'), 400);
+    
+    // Update number
     moodValueDisplay.textContent = value;
-    moodLabelDisplay.textContent = getMoodLabel(parseInt(value));
+    moodLabelDisplay.textContent = getMoodLabel(value);
+    
+    // Animate emoji change
+    if (moodEmoji) {
+        moodEmoji.classList.add('changed');
+        setTimeout(() => moodEmoji.classList.remove('changed'), 400);
+        moodEmoji.textContent = getMoodEmoji(value);
+    }
 }
 
 /**
@@ -170,8 +185,14 @@ function updateCharCount() {
  * Save today's mood entry
  */
 function saveEntry() {
-    // Get all the values
-    const entry = {
+    // Add loading state to button
+    saveButton.classList.add('loading');
+    saveButton.textContent = '';
+
+    // Simulate save delay for better UX
+    setTimeout(() => {
+        // Get all the values
+        const entry = {
         date: getTodayDateString(),
         overallMood: parseInt(overallMoodSlider.value),
         attributes: {
@@ -198,12 +219,25 @@ function saveEntry() {
     // Sort entries by date (newest first)
     moodEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // Show success message
-    showSuccessMessage();
+    // Remove loading, add success state
+        saveButton.classList.remove('loading');
+        saveButton.classList.add('success');
+        saveButton.textContent = '✓ Saved!';
 
-    // Update the display
-    displayHistory();
-    displayStats();
+        setTimeout(() => {
+            saveButton.classList.remove('success');
+            const today = getTodayDateString();
+            const todayEntry = moodEntries.find(e => e.date === today);
+            saveButton.textContent = todayEntry ? 'Update Today\'s Entry' : 'Save Today\'s Entry';
+        }, 2000);
+
+        // Show success message
+        showSuccessMessage();
+
+        // Update the display
+        displayHistory();
+        displayStats();
+    }, 600); // 600ms delay for loading animation
 }
 
 /**
@@ -239,10 +273,26 @@ function displayHistory() {
     const recentEntries = moodEntries.slice(0, 7);
 
     // Create a card for each entry
-    recentEntries.forEach(entry => {
+    recentEntries.forEach((entry, index) => {
         const card = createHistoryCard(entry);
+        card.style.transitionDelay = `${index * 0.1}s`;
         historyContainer.appendChild(card);
     });
+
+    // Re-observe new cards for scroll animation
+    setTimeout(() => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.history-card').forEach(el => {
+            observer.observe(el);
+        });
+    }, 100);
 }
 
 /**
@@ -369,6 +419,105 @@ function loadTodayEntry() {
 // INITIALIZE APP
 // ============================================
 
+// ============================================
+// SCROLL ANIMATIONS
+// ============================================
+
+/**
+ * Set up Intersection Observer for scroll animations
+ */
+function setupScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all elements with animate-on-scroll class
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Observe history cards
+    document.querySelectorAll('.history-card').forEach(el => {
+        observer.observe(el);
+    });
+}
+
+/**
+ * Handle header shrink on scroll
+ */
+function setupHeaderScroll() {
+    const header = document.getElementById('mainHeader');
+    let lastScroll = 0;
+
+    window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+
+        if (currentScroll > 100) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+
+        lastScroll = currentScroll;
+    });
+}
+
+/**
+ * Set up back to top button
+ */
+function setupBackToTop() {
+    const backToTopBtn = document.getElementById('backToTop');
+
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.add('visible');
+        } else {
+            backToTopBtn.classList.remove('visible');
+        }
+    });
+
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+
+/**
+ * Add ripple effect to buttons
+ */
+function addRippleEffect(e) {
+    const button = e.currentTarget;
+    const ripple = document.createElement('span');
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    ripple.classList.add('ripple');
+
+    button.appendChild(ripple);
+
+    setTimeout(() => ripple.remove(), 600);
+}
+
+// ============================================
+// INITIALIZE APP
+// ============================================
+
 /**
  * Set up the app when page loads
  */
@@ -401,6 +550,14 @@ function initializeApp() {
     // Display history and stats
     displayHistory();
     displayStats();
+
+    // Set up scroll animations
+    setupScrollAnimations();
+    setupHeaderScroll();
+    setupBackToTop();
+
+    // Add ripple effect to save button
+    saveButton.addEventListener('mousedown', addRippleEffect);
 
     // Add some sample data for demonstration (you can remove this)
     addSampleData();
@@ -474,6 +631,9 @@ function addSampleData() {
     // Display the sample data
     displayHistory();
     displayStats();
+
+    // Re-setup scroll animations for new elements
+    setTimeout(setupScrollAnimations, 100);
 }
 
 // ============================================
