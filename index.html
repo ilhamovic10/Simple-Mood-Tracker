@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Mood Tracker</title>
+    <meta name="description" content="Track your daily mood and mental wellness">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <!-- App Container -->
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">Simple Mood Tracker</h1>
+                <p class="app-subtitle">How are you feeling today?</p>
+            </div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-button active" data-tab="track" role="tab" aria-selected="true">
+                <span class="tab-icon">✨</span>
+                <span class="tab-text">Track Today</span>
+            </button>
+            <button class="tab-button" data-tab="stats" role="tab" aria-selected="false">
+                <span class="tab-icon">📊</span>
+                <span class="tab-text">Statistics</span>
+            </button>
+            <button class="tab-button" data-tab="history" role="tab" aria-selected="false">
+                <span class="tab-icon">📅</span>
+                <span class="tab-text">History</span>
+            </button>
+        </nav>
+
+        <!-- Tab Content -->
+        <main class="tab-content-wrapper">
+            
+            <!-- TRACK TODAY TAB -->
+            <section class="tab-content active" id="track-tab">
+                <div class="content-card">
+                    <p class="current-date" id="currentDate"></p>
+                    
+                    <h2 class="section-title">Tap the emoji that matches your mood</h2>
+                    
+                    <!-- Emoji Grid -->
+                    <div class="emoji-grid">
+                        <button class="emoji-button" data-mood="happy" data-value="9" aria-label="Happy">
+                            <span class="emoji-icon">😊</span>
+                            <span class="emoji-label">Happy</span>
+                        </button>
+                        <button class="emoji-button" data-mood="sad" data-value="3" aria-label="Sad">
+                            <span class="emoji-icon">😔</span>
+                            <span class="emoji-label">Sad</span>
+                        </button>
+                        <button class="emoji-button" data-mood="angry" data-value="2" aria-label="Angry">
+                            <span class="emoji-icon">😠</span>
+                            <span class="emoji-label">Angry</span>
+                        </button>
+                        <button class="emoji-button" data-mood="anxious" data-value="4" aria-label="Anxious">
+                            <span class="emoji-icon">😰</span>
+                            <span class="emoji-label">Anxious</span>
+                        </button>
+                        <button class="emoji-button" data-mood="neutral" data-value="5" aria-label="Neutral">
+                            <span class="emoji-icon">😐</span>
+                            <span class="emoji-label">Neutral</span>
+                        </button>
+                        <button class="emoji-button" data-mood="excited" data-value="10" aria-label="Excited">
+                            <span class="emoji-icon">😍</span>
+                            <span class="emoji-label">Excited</span>
+                        </button>
+                    </div>
+
+                    <!-- Attribute Sliders -->
+                    <div class="attributes-section">
+                        <h3 class="subsection-title">How do you rate these?</h3>
+                        
+                        <div class="attribute-item">
+                            <div class="attribute-header">
+                                <span class="attribute-icon">⚡</span>
+                                <span class="attribute-name">Energy Level</span>
+                                <span class="attribute-value" id="energyValue">5</span>
+                            </div>
+                            <input type="range" min="1" max="10" value="5" class="attribute-slider" id="energySlider" aria-label="Energy Level">
+                        </div>
+
+                        <div class="attribute-item">
+                            <div class="attribute-header">
+                                <span class="attribute-icon">😴</span>
+                                <span class="attribute-name">Sleep Quality</span>
+                                <span class="attribute-value" id="sleepValue">5</span>
+                            </div>
+                            <input type="range" min="1" max="10" value="5" class="attribute-slider" id="sleepSlider" aria-label="Sleep Quality">
+                        </div>
+
+                        <div class="attribute-item">
+                            <div class="attribute-header">
+                                <span class="attribute-icon">😰</span>
+                                <span class="attribute-name">Stress Level</span>
+                                <span class="attribute-value" id="stressValue">5</span>
+                            </div>
+                            <input type="range" min="1" max="10" value="5" class="attribute-slider" id="stressSlider" aria-label="Stress Level">
+                        </div>
+
+                        <div class="attribute-item">
+                            <div class="attribute-header">
+                                <span class="attribute-icon">✅</span>
+                                <span class="attribute-name">Productivity</span>
+                                <span class="attribute-value" id="productivityValue">5</span>
+                            </div>
+                            <input type="range" min="1" max="10" value="5" class="attribute-slider" id="productivitySlider" aria-label="Productivity">
+                        </div>
+
+                        <div class="attribute-item">
+                            <div class="attribute-header">
+                                <span class="attribute-icon">💬</span>
+                                <span class="attribute-name">Social Connection</span>
+                                <span class="attribute-value" id="socialValue">5</span>
+                            </div>
+                            <input type="range" min="1" max="10" value="5" class="attribute-slider" id="socialSlider" aria-label="Social Connection">
+                        </div>
+                    </div>
+
+                    <!-- Notes (Optional) -->
+                    <div class="notes-section">
+                        <label for="notesInput" class="notes-label">Notes (Optional)</label>
+                        <textarea 
+                            id="notesInput" 
+                            class="notes-textarea" 
+                            placeholder="Want to write something about your day?"
+                            maxlength="200"
+                            aria-label="Optional notes about your day"
+                        ></textarea>
+                        <span class="char-count" id="charCount">0/200</span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button class="submit-button" id="submitMood" aria-label="Submit your mood entry">
+                        <span class="button-text">Submit Mood</span>
+                    </button>
+
+                    <div class="success-message" id="successMessage" role="alert" aria-live="polite">
+                        <span class="success-icon">✓</span>
+                        <span>Mood saved successfully!</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STATISTICS TAB -->
+            <section class="tab-content" id="stats-tab">
+                <div class="content-card">
+                    <h2 class="section-title">Your Mood Trends</h2>
+                    
+                    <!-- Period Selector -->
+                    <div class="period-selector">
+                        <button class="period-button active" data-period="daily">Daily</button>
+                        <button class="period-button" data-period="weekly">Weekly</button>
+                        <button class="period-button" data-period="monthly">Monthly</button>
+                    </div>
+
+                    <!-- Graph Container -->
+                    <div class="graph-container">
+                        <svg class="mood-graph" id="moodGraph" viewBox="0 0 800 300" role="img" aria-label="Mood trend graph"></svg>
+                        <div class="graph-empty" id="graphEmpty">
+                            <span class="empty-icon">📈</span>
+                            <p>Start tracking to see your mood trends!</p>
+                        </div>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-icon">📅</span>
+                            <span class="stat-label">Weekly Average</span>
+                            <span class="stat-value" id="weeklyAvg">-</span>
+                            <span class="stat-emoji" id="weeklyEmoji">😊</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-icon">📊</span>
+                            <span class="stat-label">Monthly Average</span>
+                            <span class="stat-value" id="monthlyAvg">-</span>
+                            <span class="stat-emoji" id="monthlyEmoji">😊</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-icon">🔥</span>
+                            <span class="stat-label">Current Streak</span>
+                            <span class="stat-value" id="streakValue">0 days</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-icon">✅</span>
+                            <span class="stat-label">Total Tracked</span>
+                            <span class="stat-value" id="totalValue">0 days</span>
+                        </div>
+                    </div>
+
+                    <!-- Attribute Breakdown -->
+                    <div class="attribute-breakdown">
+                        <h3 class="subsection-title">Average Attribute Scores</h3>
+                        <div id="attributeBars"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- HISTORY TAB -->
+            <section class="tab-content" id="history-tab">
+                <div class="content-card">
+                    <h2 class="section-title">Your Mood History</h2>
+                    
+                    <!-- Filters -->
+                    <div class="history-filters">
+                        <button class="filter-chip active" data-filter="all">All</button>
+                        <button class="filter-chip" data-filter="week">This Week</button>
+                        <button class="filter-chip" data-filter="month">This Month</button>
+                        <button class="filter-chip" data-filter="good">Good Days</button>
+                        <button class="filter-chip" data-filter="tough">Tough Days</button>
+                    </div>
+
+                    <!-- History List -->
+                    <div class="history-list" id="historyList"></div>
+                    
+                    <div class="history-empty" id="historyEmpty">
+                        <span class="empty-icon">📝</span>
+                        <p>No entries yet. Start tracking your mood!</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Copyright Footer -->
+    <footer class="app-footer">
+        <p class="copyright-text">Developed by <span class="developer-name">Mi_1x0</span></p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
