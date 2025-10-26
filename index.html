@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Mood Tracker</title>
+    <style>
+        /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light Mode (Default) */
+            --bg-primary: #F5F8FA;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #E8F0F5;
+            --text-primary: #2D3748;
+            --text-secondary: #718096;
+            --border-color: #E8F0F5;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --primary: #6C63FF;
+            --primary-hover: #5850E6;
+            --success: #68D391;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1A202C;
+            --bg-secondary: #2D3748;
+            --bg-tertiary: #4A5568;
+            --text-primary: #F7FAFC;
+            --text-secondary: #E2E8F0;
+            --border-color: #4A5568;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background 0.3s, color 0.3s;
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           LOGIN SCREEN
+           ============================================ */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 48px 32px;
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+
+        .login-header {
+            position: relative;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .theme-switcher {
+            position: absolute;
+            top: -16px;
+            right: -16px;
+            display: flex;
+            gap: 8px;
+            background: var(--bg-tertiary);
+            padding: 6px;
+            border-radius: 12px;
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+
+        .theme-btn:hover {
+            background: var(--bg-secondary);
+            transform: scale(1.1);
+        }
+
+        .theme-btn.active {
+            background: var(--primary);
+        }
+
+        .app-logo {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .login-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+        }
+
+        .login-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .user-cards {
+            display: grid;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .user-avatar {
+            font-size: 32px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border-radius: 50%;
+        }
+
+        .user-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .user-stats {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .delete-btn {
+            padding: 8px 12px;
+            background: #FFE5E5;
+            color: #FC8181;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #FC8181;
+            color: white;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            margin: 16px 0;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .primary-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .primary-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .secondary-btn {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .developer-name {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* ============================================
+           MAIN APP
+           ============================================ */
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .user-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .current-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .theme-switcher-mini {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-tertiary);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .theme-btn-mini {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .theme-btn-mini.active {
+            background: var(--primary);
+        }
+
+        .switch-btn {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .switch-btn:hover {
+            transform: rotate(180deg);
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .tab-nav {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            background: var(--bg-secondary);
+            padding: 8px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            padding: 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-icon {
+            font-size: 28px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .content-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 2px 12px var(--shadow);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .date-time {
+            text-align: center;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .time-display {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: monospace;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .emoji-btn {
+            padding: 24px;
+            background: var(--bg-tertiary);
+            border: 3px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .emoji-btn:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+        }
+
+        .emoji-btn.selected {
+            border-color: var(--primary);
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        .emoji-icon {
+            font-size: 48px;
+        }
+
+        .emoji-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* Dark mode - make emoji labels white for visibility */
+        [data-theme="dark"] .emoji-label {
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        /* When emoji is selected, make label more prominent */
+        .emoji-btn.selected .emoji-label {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        [data-theme="dark"] .emoji-btn.selected .emoji-label {
+            color: #FFFFFF;
+        }
+
+        .attributes {
+            margin-bottom: 32px;
+        }
+
+        .attr-item {
+            margin-bottom: 20px;
+        }
+
+        .attr-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .attr-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .attr-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 999px;
+            outline: none;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #FFB6B9, #FFE66D, #A8E6CF);
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .notes-section {
+            margin-bottom: 24px;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .notes-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            max-width: 400px;
+            display: block;
+            margin: 0 auto;
+            padding: 16px;
+            background: linear-gradient(135deg, #6C63FF 0%, #8B7FFF 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(108, 99, 255, 0.2);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(108, 99, 255, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.2);
+        }
+
+        .submit-btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .success-msg {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(104, 211, 145, 0.1);
+            border: 2px solid var(--success);
+            border-radius: 12px;
+            color: var(--success);
+        }
+
+        .success-msg.show {
+            display: flex;
+        }
+
+        /* Stats */
+        .period-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .period-btn {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .period-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .graph-container {
+            min-height: 300px;
+            padding: 24px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .graph-svg {
+            width: 100%;
+            height: 300px;
+        }
+
+        .graph-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            color: var(--text-secondary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            padding: 24px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* History */
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-chip.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .history-card {
+            padding: 24px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .history-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .history-emoji {
+            font-size: 48px;
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-date {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .history-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .history-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .history-attrs {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .history-attr {
+            text-align: center;
+        }
+
+        .history-attr-icon {
+            font-size: 20px;
+        }
+
+        .history-attr-value {
+            display: block;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .history-notes {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .emoji-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .history-attrs {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ERROR NOTIFICATION (Red) -->
+    <div id="errorNotification" class="error-notification">
+        <span class="error-icon">⚠️</span>
+        <span class="error-text">Please select your mood emoji first!</span>
+    </div>
+
+    <!-- SUCCESS NOTIFICATION (Green) -->
+    <div id="successNotification" class="success-notification">
+        <span class="success-icon">✓</span>
+        <span class="success-text">Mood saved successfully!</span>
+    </div>
+
+    <!-- LOGIN SCREEN -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light">☀️</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark">🌙</button>
+                    <button class="theme-btn active" data-theme="system" title="System">💻</button>
+                </div>
+                <div class="app-logo">✨</div>
+                <h1 class="login-title">Simple Mood Tracker</h1>
+                <p class="login-subtitle">Track your daily mood and mental wellness</p>
+            </div>
+
+            <div id="userList" style="display: none;">
+                <h2 class="section-title">Select Your Profile</h2>
+                <div class="user-cards" id="userCards"></div>
+            </div>
+
+            <div id="createUserForm">
+                <h2 class="section-title" id="formTitle">Create Your Profile</h2>
+                <input type="text" id="usernameInput" class="form-input" placeholder="Enter your name" maxlength="20">
+                <button class="primary-btn" id="createUserBtn">Start Tracking</button>
+                <button class="secondary-btn" id="cancelBtn" style="display: none;">Cancel</button>
+            </div>
+
+            <button class="primary-btn" id="addUserBtn" style="display: none; margin-top: 16px;">+ Add Another User</button>
+            <div id="userLimit" style="display: none; text-align: center; margin-top: 16px; color: #F6AD55;">
+                ⚠️ Maximum 5 users reached
+            </div>
+
+            <div class="login-footer">
+                <p>Developed by <span class="developer-name">Mi_1x0</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div class="app-container" id="appContainer" style="display: none;">
+        <div class="user-bar">
+            <div class="current-user">
+                <span class="user-avatar" id="currentUserAvatar">👤</span>
+                <span class="user-name" id="currentUserName">User</span>
+            </div>
+            <div class="header-actions">
+                <div class="theme-switcher-mini">
+                    <button class="theme-btn-mini" data-theme="light" title="Light">☀️</button>
+                    <button class="theme-btn-mini" data-theme="dark" title="Dark">🌙</button>
+                    <button class="theme-btn-mini active" data-theme="system" title="System">💻</button>
+                </div>
+                <button class="switch-btn" id="switchUserBtn" title="Switch User">↻</button>
+            </div>
+        </div>
+
+        <header class="app-header">
+            <h1 class="app-title">Simple Mood Tracker</h1>
+            <p class="login-subtitle">How are you feeling today?</p>
+        </header>
+
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="track">
+                <span class="tab-icon">✨</span>
+                <span>Track</span>
+            </button>
+            <button class="tab-btn" data-tab="stats">
+                <span class="tab-icon">📊</span>
+                <span>Stats</span>
+            </button>
+            <button class="tab-btn" data-tab="history">
+                <span class="tab-icon">📅</span>
+                <span>History</span>
+            </button>
+        </nav>
+
+        <!-- TRACK TAB -->
+        <div class="tab-content active" id="trackTab">
+            <div class="content-card">
+                <div class="date-time" id="dateTime"></div>
+                
+                <h2 class="section-title">How are you feeling?</h2>
+                
+                <div class="emoji-grid">
+                    <button class="emoji-btn" data-mood="happy" data-value="9">
+                        <span class="emoji-icon">😊</span>
+                        <span class="emoji-label">Happy</span>
+                    </button>
+                    <button class="emoji-btn" data-mood="sad" data-value="3">
+                        <span class="emoji-icon">😔</span>
+                        <span class="emoji-label">Sad</span>
+                    </button>
+                    <button class="emoji-btn" data-mood="angry" data-value="2">
+                        <span class="emoji-icon">😠</span>
+                        <span class="emoji-label">Angry</span>
+                    </button>
+                    <button class="emoji-btn" data-mood="anxious" data-value="4">
+                        <span class="emoji-icon">😰</span>
+                        <span class="emoji-label">Anxious</span>
+                    </button>
+                    <button class="emoji-btn" data-mood="neutral" data-value="5">
+                        <span class="emoji-icon">😐</span>
+                        <span class="emoji-label">Neutral</span>
+                    </button>
+                    <button class="emoji-btn" data-mood="excited" data-value="10">
+                        <span class="emoji-icon">😍</span>
+                        <span class="emoji-label">Excited</span>
+                    </button>
+                </div>
+
+                <div class="attributes">
+                    <h3 class="section-title">Rate these attributes</h3>
+                    
+                    <div class="attr-item">
+                        <div class="attr-header">
+                            <span>⚡</span>
+                            <span class="attr-name">Energy Level</span>
+                            <span class="attr-value" id="energyVal">5</span>
+                        </div>
+                        <input type="range" min="1" max="10" value="5" class="slider" id="energySlider">
+                    </div>
+
+                    <div class="attr-item">
+                        <div class="attr-header">
+                            <span>😴</span>
+                            <span class="attr-name">Sleep Quality</span>
+                            <span class="attr-value" id="sleepVal">5</span>
+                        </div>
+                        <input type="range" min="1" max="10" value="5" class="slider" id="sleepSlider">
+                    </div>
+
+                    <div class="attr-item">
+                        <div class="attr-header">
+                            <span>😰</span>
+                            <span class="attr-name">Stress Level</span>
+                            <span class="attr-value" id="stressVal">5</span>
+                        </div>
+                        <input type="range" min="1" max="10" value="5" class="slider" id="stressSlider">
+                    </div>
+
+                    <div class="attr-item">
+                        <div class="attr-header">
+                            <span>✅</span>
+                            <span class="attr-name">Productivity</span>
+                            <span class="attr-value" id="productivityVal">5</span>
+                        </div>
+                        <input type="range" min="1" max="10" value="5" class="slider" id="productivitySlider">
+                    </div>
+
+                    <div class="attr-item">
+                        <div class="attr-header">
+                            <span>💬</span>
+                            <span class="attr-name">Social Connection</span>
+                            <span class="attr-value" id="socialVal">5</span>
+                        </div>
+                        <input type="range" min="1" max="10" value="5" class="slider" id="socialSlider">
+                    </div>
+                </div>
+
+                <div class="notes-section">
+                    <label>Notes (Optional)</label>
+                    <textarea id="notesInput" class="notes-textarea" placeholder="How was your day?" maxlength="200"></textarea>
+                    <div class="char-count" id="charCount">0/200</div>
+                </div>
+
+                <button class="submit-btn" id="submitMoodBtn">Submit Mood</button>
+            </div>
+        </div>
+
+        <!-- STATS TAB -->
+        <div class="tab-content" id="statsTab">
+            <div class="content-card">
+                <h2 class="section-title">Your Mood Trends</h2>
+                
+                <div class="period-selector">
+                    <button class="period-btn active" data-period="daily">Daily</button>
+                    <button class="period-btn" data-period="weekly">Weekly</button>
+                    <button class="period-btn" data-period="monthly">Monthly</button>
+                </div>
+
+                <div class="graph-container">
+                    <svg class="graph-svg" id="graphSvg"></svg>
+                    <div class="graph-empty" id="graphEmpty">
+                        <span style="font-size: 64px;">📈</span>
+                        <p>Start tracking to see your trends!</p>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-label">Weekly Avg</div>
+                        <div class="stat-value" id="weeklyAvg">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-label">Monthly Avg</div>
+                        <div class="stat-value" id="monthlyAvg">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-label">Streak</div>
+                        <div class="stat-value" id="streakVal">0 days</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-label">Total</div>
+                        <div class="stat-value" id="totalVal">0 days</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HISTORY TAB -->
+        <div class="tab-content" id="historyTab">
+            <div class="content-card">
+                <h2 class="section-title">Your Mood History</h2>
+                
+                <div class="filter-chips">
+                    <button class="filter-chip active" data-filter="all">All</button>
+                    <button class="filter-chip" data-filter="week">This Week</button>
+                    <button class="filter-chip" data-filter="month">This Month</button>
+                    <button class="filter-chip" data-filter="good">Good Days</button>
+                    <button class="filter-chip" data-filter="tough">Tough Days</button>
+                </div>
+
+                <div class="history-list" id="historyList"></div>
+                <div class="graph-empty" id="historyEmpty" style="display: none;">
+                    <span style="font-size: 64px;">📝</span>
+                    <p>No entries yet. Start tracking!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* ERROR NOTIFICATION STYLES */
+        .error-notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #EF4444;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            z-index: 9999;
+            font-weight: 600;
+            animation: slideDown 0.3s ease;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-notification.show {
+            display: flex;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .error-icon {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        .error-text {
+            font-size: 14px;
+        }
+
+        /* SUCCESS NOTIFICATION STYLES */
+        .success-notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10B981;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            z-index: 9999;
+            font-weight: 600;
+            animation: slideDown 0.3s ease;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .success-notification.show {
+            display: flex;
+        }
+
+        .success-icon {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        .success-text {
+            font-size: 14px;
+        }
+    </style>
+
+    <script>
+        // ============================================
+        // DATA STORAGE
+        // ============================================
+        let users = [];
+        let currentUser = null;
+        let allUserData = {};
+        let moodEntries = [];
+        let selectedMood = null;
+        let currentPeriod = 'daily';
+        let currentFilter = 'all';
+        let currentTheme = 'system';
+        const MAX_USERS = 5;
+
+        // ============================================
+        // NOTIFICATION FUNCTIONS
+        // ============================================
+        function showErrorNotification(message) {
+            const notification = document.getElementById('errorNotification');
+            const errorText = notification.querySelector('.error-text');
+            errorText.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function showSuccessNotification(message) {
+            const notification = document.getElementById('successNotification');
+            const successText = notification.querySelector('.success-text');
+            successText.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // ============================================
+        // THEME SYSTEM
+        // ============================================
+        function initTheme() {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (currentTheme === 'system') {
+                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', currentTheme);
+            }
+            updateThemeButtons();
+        }
+
+        function updateThemeButtons() {
+            document.querySelectorAll('.theme-btn, .theme-btn-mini').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.theme === currentTheme);
+            });
+        }
+
+        function setupTheme() {
+            document.querySelectorAll('.theme-btn, .theme-btn-mini').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentTheme = btn.dataset.theme;
+                    initTheme();
+                });
+            });
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (currentTheme === 'system') initTheme();
+            });
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function getTodayDate() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+        
+        function getTodayDateFormatted() {
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return today.toLocaleDateString('en-US', options);
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            const options = { weekday: 'short', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function formatDateTime() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            const timeStr = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
+            });
+            return `<div><strong>${dateStr}</strong></div><div class="time-display">${timeStr}</div>`;
+        }
+
+        function getMoodEmoji(value) {
+            if (value <= 2) return '😢';
+            if (value <= 4) return '😔';
+            if (value <= 6) return '😐';
+            if (value <= 8) return '😊';
+            return '😍';
+        }
+
+        function getMoodLabel(value) {
+            if (value <= 2) return 'Very Difficult';
+            if (value <= 4) return 'Challenging';
+            if (value <= 6) return 'Okay';
+            if (value <= 8) return 'Good';
+            return 'Excellent';
+        }
+
+        function getRandomAvatar() {
+            const avatars = ['😊', '🙂', '😎', '🤗', '😌', '🥳', '😇', '🤓', '😋', '🥰'];
+            return avatars[Math.floor(Math.random() * avatars.length)];
+        }
+
+        function calculateStreak() {
+            if (moodEntries.length === 0) return 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let streak = 0;
+            let currentDate = new Date(today);
+            const sorted = [...moodEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            for (let entry of sorted) {
+                const entryDate = new Date(entry.date + 'T00:00:00');
+                entryDate.setHours(0, 0, 0, 0);
+                if (entryDate.getTime() === currentDate.getTime()) {
+                    streak++;
+                    currentDate.setDate(currentDate.getDate() - 1);
+                } else if (entryDate.getTime() < currentDate.getTime()) {
+                    break;
+                }
+            }
+            return streak;
+        }
+
+        // ============================================
+        // USER MANAGEMENT
+        // ============================================
+        function showLoginScreen(isFirstTime) {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('appContainer').style.display = 'none';
+            
+            if (isFirstTime || users.length === 0) {
+                document.getElementById('userList').style.display = 'none';
+                document.getElementById('createUserForm').style.display = 'block';
+                document.getElementById('addUserBtn').style.display = 'none';
+                document.getElementById('formTitle').textContent = 'Create Your Profile';
+                document.getElementById('cancelBtn').style.display = 'none';
+            } else {
+                document.getElementById('userList').style.display = 'block';
+                document.getElementById('createUserForm').style.display = 'none';
+                document.getElementById('addUserBtn').style.display = users.length < MAX_USERS ? 'block' : 'none';
+                document.getElementById('userLimit').style.display = users.length >= MAX_USERS ? 'block' : 'none';
+                renderUserCards();
+            }
+        }
+
+        function renderUserCards() {
+            const container = document.getElementById('userCards');
+            container.innerHTML = '';
+            
+            users.forEach(user => {
+                const userEntries = allUserData[user.id] || [];
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                card.innerHTML = `
+                    <div class="user-info" onclick="selectUser('${user.id}')">
+                        <div class="user-avatar">${user.avatar}</div>
+                        <div>
+                            <div class="user-name">${user.name}</div>
+                            <div class="user-stats">${userEntries.length} entries</div>
+                        </div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteUser('${user.id}')">Delete</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function createUser() {
+            const input = document.getElementById('usernameInput');
+            const name = input.value.trim();
+            
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            if (users.length >= MAX_USERS) {
+                alert('Maximum 5 users allowed');
+                return;
+            }
+            
+            const newUser = {
+                id: Date.now().toString(),
+                name: name,
+                avatar: getRandomAvatar()
+            };
+            
+            users.push(newUser);
+            allUserData[newUser.id] = [];
+            input.value = '';
+            selectUser(newUser.id);
+        }
+
+        function selectUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            if (currentUser) {
+                allUserData[currentUser.id] = moodEntries;
+            }
+            
+            currentUser = user;
+            moodEntries = allUserData[user.id] || [];
+            
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('currentUserAvatar').textContent = user.avatar;
+            document.getElementById('currentUserName').textContent = user.name;
+            
+            initApp();
+        }
+
+        function deleteUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user || !confirm(`Delete ${user.name}'s profile?`)) return;
+            
+            users = users.filter(u => u.id !== userId);
+            delete allUserData[userId];
+            
+            if (currentUser && currentUser.id === userId) {
+                currentUser = null;
+                moodEntries = [];
+            }
+            
+            showLoginScreen(users.length === 0);
+        }
+
+        /**
+         * Reset tracking form after submission
+         */
+        function resetTrackingForm() {
+            // Clear mood selection
+            selectedMood = null;
+            document.querySelectorAll('.emoji-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Reset sliders to 5
+            energySlider.value = 5;
+            sleepSlider.value = 5;
+            stressSlider.value = 5;
+            productivitySlider.value = 5;
+            socialSlider.value = 5;
+            
+            // Update slider displays
+            energyValue.textContent = '5';
+            sleepValue.textContent = '5';
+            stressValue.textContent = '5';
+            productivityValue.textContent = '5';
+            socialValue.textContent = '5';
+            
+            // Clear notes
+            notesInput.value = '';
+            charCount.textContent = '0/200';
+            
+            console.log('✅ Form reset complete');
+        }
+
+        function switchUser() {
+            if (currentUser) {
+                allUserData[currentUser.id] = moodEntries;
+            }
+            currentUser = null;
+            moodEntries = [];
+            selectedMood = null;
+            resetForm();
+            showLoginScreen(false);
+        }
+
+        function resetForm() {
+            console.log('🔄 Resetting form...');
+            
+            // Clear mood selection
+            selectedMood = null;
+            document.querySelectorAll('.emoji-btn').forEach(btn => btn.classList.remove('selected'));
+            
+            // Reset sliders to 5
+            document.getElementById('energySlider').value = 5;
+            document.getElementById('sleepSlider').value = 5;
+            document.getElementById('stressSlider').value = 5;
+            document.getElementById('productivitySlider').value = 5;
+            document.getElementById('socialSlider').value = 5;
+            
+            // Update displays
+            document.getElementById('energyVal').textContent = '5';
+            document.getElementById('sleepVal').textContent = '5';
+            document.getElementById('stressVal').textContent = '5';
+            document.getElementById('productivityVal').textContent = '5';
+            document.getElementById('socialVal').textContent = '5';
+            
+            // Clear notes
+            document.getElementById('notesInput').value = '';
+            updateCharCount();
+            
+            console.log('✅ Form reset complete');
+        }
+
+        // ============================================
+        // MOOD TRACKING
+        // ============================================
+        function setupEmojiButtons() {
+            document.querySelectorAll('.emoji-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedMood = {
+                        mood: btn.dataset.mood,
+                        value: parseInt(btn.dataset.value)
+                    };
+                });
+            });
+        }
+
+        function setupSliders() {
+            const sliders = [
+                { slider: 'energySlider', display: 'energyVal' },
+                { slider: 'sleepSlider', display: 'sleepVal' },
+                { slider: 'stressSlider', display: 'stressVal' },
+                { slider: 'productivitySlider', display: 'productivityVal' },
+                { slider: 'socialSlider', display: 'socialVal' }
+            ];
+            
+            sliders.forEach(({ slider, display }) => {
+                const sliderEl = document.getElementById(slider);
+                if (sliderEl) {
+                    sliderEl.addEventListener('input', updateSliders);
+                }
+            });
+            
+            console.log('✅ Sliders initialized');
+        }
+
+        function updateSliders() {
+            const energySlider = document.getElementById('energySlider');
+            const sleepSlider = document.getElementById('sleepSlider');
+            const stressSlider = document.getElementById('stressSlider');
+            const productivitySlider = document.getElementById('productivitySlider');
+            const socialSlider = document.getElementById('socialSlider');
+            
+            if (energySlider) document.getElementById('energyVal').textContent = energySlider.value;
+            if (sleepSlider) document.getElementById('sleepVal').textContent = sleepSlider.value;
+            if (stressSlider) document.getElementById('stressVal').textContent = stressSlider.value;
+            if (productivitySlider) document.getElementById('productivityVal').textContent = productivitySlider.value;
+            if (socialSlider) document.getElementById('socialVal').textContent = socialSlider.value;
+        }
+
+        function updateCharCount() {
+            const count = document.getElementById('notesInput').value.length;
+            document.getElementById('charCount').textContent = `${count}/200`;
+        }
+
+        function submitMood() {
+            console.log('🔵 Submit button clicked');
+            
+            // VALIDATION 1: Check user logged in
+            if (!currentUser) {
+                showErrorNotification('Please log in first!');
+                console.error('❌ No user logged in');
+                return;
+            }
+            console.log('✓ User check passed:', currentUser.name);
+            
+            // VALIDATION 2: Check mood selected (SHOW RED NOTIFICATION)
+            if (!selectedMood) {
+                showErrorNotification('Please select your mood emoji first!');
+                console.warn('⚠️ No mood selected');
+                return;
+            }
+            console.log('✓ Mood check passed:', selectedMood);
+            
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.toTimeString().split(' ')[0];
+            
+            const entry = {
+                id: Date.now().toString(),
+                userId: currentUser.id,
+                date: dateStr,
+                time: timeStr,
+                mood: selectedMood.mood,
+                value: selectedMood.value,
+                moodEmoji: getMoodEmoji(selectedMood.value),
+                moodLabel: getMoodLabel(selectedMood.value),
+                attributes: {
+                    energy: parseInt(document.getElementById('energySlider').value),
+                    sleep: parseInt(document.getElementById('sleepSlider').value),
+                    stress: parseInt(document.getElementById('stressSlider').value),
+                    productivity: parseInt(document.getElementById('productivitySlider').value),
+                    social: parseInt(document.getElementById('socialSlider').value)
+                },
+                notes: document.getElementById('notesInput').value.trim()
+            };
+            
+            // Check if entry for today already exists
+            const existingIndex = moodEntries.findIndex(e => e.date === dateStr);
+            if (existingIndex !== -1) {
+                console.log('✏️ Updating existing entry for today');
+                moodEntries[existingIndex] = entry;
+            } else {
+                console.log('➕ Adding new entry');
+                moodEntries.push(entry);
+            }
+            
+            console.log('📦 Entry created:', entry);
+            console.log('📊 Total entries:', moodEntries.length);
+            
+            moodEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+            allUserData[currentUser.id] = moodEntries;
+            
+            console.log('💾 Saved to user data:', moodEntries.length, 'entries');
+            
+            // Show success notification
+            showSuccessNotification('Mood saved successfully!');
+            
+            // Reset form
+            resetForm();
+            
+            // Update displays based on active tab
+            const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab;
+            console.log('🔄 Updating displays for tab:', activeTab);
+            
+            if (activeTab === 'stats') {
+                updateStatistics();
+                drawGraph();
+            } else if (activeTab === 'history') {
+                updateHistory();
+            }
+            
+            // Always update history if on history tab
+            updateHistory();
+            updateStatistics();
+            
+            console.log('✅ SUBMIT COMPLETE');
+        }
+
+        // ============================================
+        // TABS
+        // ============================================
+        function setupTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    btn.classList.add('active');
+                    const tabId = btn.dataset.tab + 'Tab';
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    if (btn.dataset.tab === 'stats') {
+                        updateStatistics();
+                        drawGraph();
+                    } else if (btn.dataset.tab === 'history') {
+                        displayHistory();
+                    }
+                });
+            });
+        }
+
+        // ============================================
+        // STATISTICS
+        // ============================================
+        function updateStatistics() {
+            if (moodEntries.length === 0) {
+                document.getElementById('weeklyAvg').textContent = '-';
+                document.getElementById('monthlyAvg').textContent = '-';
+                document.getElementById('streakVal').textContent = '0 days';
+                document.getElementById('totalVal').textContent = '0 days';
+                return;
+            }
+            
+            const today = new Date();
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const monthAgo = new Date(today);
+            monthAgo.setDate(monthAgo.getDate() - 30);
+            
+            const weekEntries = moodEntries.filter(e => new Date(e.date + 'T00:00:00') >= weekAgo);
+            const monthEntries = moodEntries.filter(e => new Date(e.date + 'T00:00:00') >= monthAgo);
+            
+            if (weekEntries.length > 0) {
+                const weekAvg = weekEntries.reduce((sum, e) => sum + e.value, 0) / weekEntries.length;
+                document.getElementById('weeklyAvg').textContent = weekAvg.toFixed(1);
+            }
+            
+            if (monthEntries.length > 0) {
+                const monthAvg = monthEntries.reduce((sum, e) => sum + e.value, 0) / monthEntries.length;
+                document.getElementById('monthlyAvg').textContent = monthAvg.toFixed(1);
+            }
+            
+            document.getElementById('streakVal').textContent = calculateStreak() + ' days';
+            document.getElementById('totalVal').textContent = moodEntries.length + ' days';
+        }
+
+        function drawGraph() {
+            const svg = document.getElementById('graphSvg');
+            const empty = document.getElementById('graphEmpty');
+            
+            if (moodEntries.length === 0) {
+                svg.style.display = 'none';
+                empty.style.display = 'flex';
+                return;
+            }
+            
+            svg.style.display = 'block';
+            empty.style.display = 'none';
+            
+            const data = prepareGraphData();
+            if (!data || data.values.length === 0) return;
+            
+            const width = 700;
+            const height = 300;
+            const padding = { top: 20, right: 20, bottom: 40, left: 40 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+            
+            svg.innerHTML = '';
+            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            
+            // Grid lines
+            for (let i = 0; i <= 10; i += 2) {
+                const y = padding.top + graphHeight - (i / 10 * graphHeight);
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', padding.left);
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', width - padding.right);
+                line.setAttribute('y2', y);
+                line.setAttribute('stroke', 'rgba(0,0,0,0.1)');
+                line.setAttribute('stroke-width', '1');
+                svg.appendChild(line);
+            }
+            
+            // Points and line
+            const points = data.values.map((value, index) => {
+                const x = padding.left + (index / Math.max(data.values.length - 1, 1)) * graphWidth;
+                const y = padding.top + graphHeight - (value / 10 * graphHeight);
+                return { x, y, value };
+            });
+            
+            // Line
+            if (points.length > 0) {
+                let pathD = `M ${points[0].x} ${points[0].y}`;
+                for (let i = 1; i < points.length; i++) {
+                    pathD += ` L ${points[i].x} ${points[i].y}`;
+                }
+                
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', pathD);
+                path.setAttribute('stroke', '#6C63FF');
+                path.setAttribute('stroke-width', '3');
+                path.setAttribute('fill', 'none');
+                svg.appendChild(path);
+                
+                // Points
+                points.forEach(point => {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', point.x);
+                    circle.setAttribute('cy', point.y);
+                    circle.setAttribute('r', '5');
+                    circle.setAttribute('fill', '#6C63FF');
+                    circle.setAttribute('stroke', 'white');
+                    circle.setAttribute('stroke-width', '2');
+                    svg.appendChild(circle);
+                });
+            }
+        }
+
+        function prepareGraphData() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (currentPeriod === 'daily') {
+                const labels = [];
+                const values = [];
+                
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    const entry = moodEntries.find(e => e.date === dateStr);
+                    
+                    labels.push(i === 0 ? 'Today' : i === 1 ? 'Yesterday' : date.toLocaleDateString('en-US', { weekday: 'short' }));
+                    values.push(entry ? entry.value : 5);
+                }
+                
+                return { labels, values };
+            }
+            
+            return { labels: [], values: [] };
+        }
+
+        function setupPeriodButtons() {
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentPeriod = btn.dataset.period;
+                    drawGraph();
+                });
+            });
+        }
+
+        // ============================================
+        // HISTORY
+        // ============================================
+        function displayHistory() {
+            const list = document.getElementById('historyList');
+            const empty = document.getElementById('historyEmpty');
+            
+            if (moodEntries.length === 0) {
+                list.style.display = 'none';
+                empty.style.display = 'flex';
+                return;
+            }
+            
+            list.style.display = 'flex';
+            empty.style.display = 'none';
+            
+            let filtered = [...moodEntries];
+            
+            if (currentFilter === 'week') {
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                filtered = filtered.filter(e => new Date(e.date + 'T00:00:00') >= weekAgo);
+            } else if (currentFilter === 'month') {
+                const monthAgo = new Date();
+                monthAgo.setDate(monthAgo.getDate() - 30);
+                filtered = filtered.filter(e => new Date(e.date + 'T00:00:00') >= monthAgo);
+            } else if (currentFilter === 'good') {
+                filtered = filtered.filter(e => e.value >= 7);
+            } else if (currentFilter === 'tough') {
+                filtered = filtered.filter(e => e.value <= 4);
+            }
+            
+            list.innerHTML = '';
+            
+            filtered.forEach(entry => {
+                const card = document.createElement('div');
+                card.className = 'history-card';
+                card.innerHTML = `
+                    <div class="history-header">
+                        <div class="history-emoji">${getMoodEmoji(entry.value)}</div>
+                        <div class="history-info">
+                            <div class="history-date">${formatDate(entry.date)}</div>
+                            <div class="history-time">${entry.time || ''}</div>
+                        </div>
+                        <div class="history-value">${entry.value}/10</div>
+                    </div>
+                    <div class="history-attrs">
+                        <div class="history-attr">
+                            <span class="history-attr-icon">⚡</span>
+                            <span class="history-attr-value">${entry.attributes.energy}</span>
+                        </div>
+                        <div class="history-attr">
+                            <span class="history-attr-icon">😴</span>
+                            <span class="history-attr-value">${entry.attributes.sleep}</span>
+                        </div>
+                        <div class="history-attr">
+                            <span class="history-attr-icon">😰</span>
+                            <span class="history-attr-value">${entry.attributes.stress}</span>
+                        </div>
+                        <div class="history-attr">
+                            <span class="history-attr-icon">✅</span>
+                            <span class="history-attr-value">${entry.attributes.productivity}</span>
+                        </div>
+                        <div class="history-attr">
+                            <span class="history-attr-icon">💬</span>
+                            <span class="history-attr-value">${entry.attributes.social}</span>
+                        </div>
+                    </div>
+                    ${entry.notes ? `<div class="history-notes">"${entry.notes}"</div>` : ''}
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function setupFilters() {
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    currentFilter = chip.dataset.filter;
+                    displayHistory();
+                });
+            });
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        function updateDateTime() {
+            const dateTimeEl = document.getElementById('dateTime');
+            if (dateTimeEl) {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('en-US', { 
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                });
+                const timeStr = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
+                });
+                dateTimeEl.innerHTML = `<div><strong>${dateStr}</strong></div><div class="time-display">${timeStr}</div>`;
+            }
+        }
+
+        function initApp() {
+            console.log('🚀 Initializing app for user:', currentUser ? currentUser.name : 'none');
+            
+            // Update date/time
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            
+            // Add sample data if empty
+            if (moodEntries.length === 0) {
+                addSampleData();
+            }
+        }
+
+        function addSampleData() {
+            // Skip if user already has entries
+            if (!currentUser || moodEntries.length > 0) {
+                console.log('⏭ Skipping sample data');
+                return;
+            }
+            
+            console.log('🎉 Adding sample data for', currentUser.name);
+            const samples = [
+                { daysAgo: 1, mood: 'happy', value: 8, energy: 7, sleep: 8, stress: 3, productivity: 9, social: 7, notes: 'Great day at work!' },
+                { daysAgo: 2, mood: 'neutral', value: 6, energy: 5, sleep: 6, stress: 6, productivity: 7, social: 5, notes: 'Okay day overall' },
+                { daysAgo: 3, mood: 'excited', value: 9, energy: 9, sleep: 9, stress: 2, productivity: 8, social: 9, notes: 'Amazing weekend!' },
+                { daysAgo: 4, mood: 'anxious', value: 4, energy: 4, sleep: 5, stress: 8, productivity: 5, social: 4, notes: 'Stressful day' },
+                { daysAgo: 5, mood: 'happy', value: 7, energy: 6, sleep: 7, stress: 4, productivity: 7, social: 6, notes: 'Good balance today' },
+            ];
+            
+            const today = new Date();
+            samples.forEach(s => {
+                const date = new Date(today);
+                date.setDate(date.getDate() - s.daysAgo);
+                const entry = {
+                    id: Date.now() + s.daysAgo,
+                    userId: currentUser.id,
+                    date: date.toISOString().split('T')[0],
+                    time: '14:30:00',
+                    mood: s.mood,
+                    value: s.value,
+                    moodEmoji: getMoodEmoji(s.value),
+                    moodLabel: getMoodLabel(s.value),
+                    attributes: { 
+                        energy: s.energy, 
+                        sleep: s.sleep, 
+                        stress: s.stress, 
+                        productivity: s.productivity, 
+                        social: s.social 
+                    },
+                    notes: s.notes
+                };
+                moodEntries.push(entry);
+            });
+            
+            moodEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+            allUserData[currentUser.id] = moodEntries;
+        }
+
+        // ============================================
+        // START APP
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            setupTheme();
+            
+            // User management
+            document.getElementById('createUserBtn').addEventListener('click', createUser);
+            document.getElementById('usernameInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') createUser();
+            });
+            document.getElementById('addUserBtn').addEventListener('click', () => {
+                document.getElementById('userList').style.display = 'none';
+                document.getElementById('createUserForm').style.display = 'block';
+                document.getElementById('addUserBtn').style.display = 'none';
+                document.getElementById('cancelBtn').style.display = 'block';
+                document.getElementById('formTitle').textContent = 'Add New User';
+            });
+            document.getElementById('cancelBtn').addEventListener('click', () => {
+                document.getElementById('usernameInput').value = '';
+                showLoginScreen(false);
+            });
+            document.getElementById('switchUserBtn').addEventListener('click', switchUser);
+            
+            // Tracking
+            setupEmojiButtons();
+            setupSliders();
+            
+            const notesInput = document.getElementById('notesInput');
+            if (notesInput) notesInput.addEventListener('input', updateCharCount);
+            
+            // Submit button - CRITICAL
+            const submitBtn = document.getElementById('submitMoodBtn');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', submitMood);
+                console.log('✅ Submit button attached');
+            } else {
+                console.error('❌ Submit button NOT found!');
+            }
+            
+            // Tabs
+            setupTabs();
+            setupPeriodButtons();
+            setupFilters();
+            
+            // Show login
+            showLoginScreen(true);
+        });
+    </script>
+</body>
+</html>
